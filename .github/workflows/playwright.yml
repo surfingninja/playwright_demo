@@ -17,6 +17,8 @@ on:
         - debug  
 jobs:
   test:
+    environment:
+      name: playwright_env
     env:
       EMAIL: ${{ secrets.EMAIL }}
       APP_PASS: ${{ secrets.APP_PASS }}
