@@ -4,6 +4,17 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug  
 jobs:
   test:
     timeout-minutes: 60
@@ -18,7 +29,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: EMAIL=${{secrets.EMAIL}} APP_PASS=${{secrets.APP_PASS}} npx playwright test
     - uses: actions/upload-artifact@v3
       if: always()
       with:
