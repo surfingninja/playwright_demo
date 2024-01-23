@@ -44,7 +44,7 @@ test.describe("Log in functionality feature", () => {
             const loginPage = new LoginPage(page);
             await loginPage.login(data.email, data.password);
             await loginPage.waitForLoaderDisappear();
-            expect(page.locator(".alert--message", { hasText: data.error })).toBeTruthy();
+            await expect(page.locator(".alert--message")).toContainText(data.error, {timeout: 10000});
         });
     }
 
