@@ -9,3 +9,11 @@ export const READ_MAIL_CONFIG = {
     tlsOptions: { rejectUnauthorized: false },
   },
 };
+
+export const SEND_MAIL_CONFIG = {
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL as string,
+    pass: process.env.APP_PASS as string
+  },
+};
