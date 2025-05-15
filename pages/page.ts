@@ -1,15 +1,13 @@
-import { type Locator, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export class BasePage {
 
     private readonly page: Page
-    private readonly acceptCookies: Locator
-    private readonly loader: Locator
+    private readonly denyCookies = "uc-deny-all-button";
+    private readonly loader = "[class*=spinner] circle";
 
     constructor(page: Page) {
-        this.page = page
-        this.acceptCookies = page.locator("button[class*=accept-all]");
-        this.loader = page.locator("[class*=spinner] circle");
+        this.page = page;
     }
 
     public async goTo(url: string) {
@@ -20,8 +18,8 @@ export class BasePage {
         await this.page.goto(this.page.url() + chunk)
     }
 
-    public async acceptAllCookies() {
-        await this.acceptCookies.click();
+    public async denyAllCookies() {
+        await this.page.getByTestId(this.denyCookies).click();
     }
 
     public async reload() {
@@ -29,10 +27,10 @@ export class BasePage {
     }
 
     public async waitForLoaderDisappear() {
-        await this.loader.waitFor({ state: 'hidden', timeout: 10000 })
+        await this.page.locator(this.loader).waitFor({ state: 'hidden', timeout: 10000 });
     }
 
-    public async generateRandomString(): Promise<string> {
+    public generateRandomString(): string {
         const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&';
         let randomString = '';
         for (let i = 0; i < 10; i++) {
@@ -40,6 +38,10 @@ export class BasePage {
             randomString += symbols.charAt(randomIndex);
         }
         return randomString;
+    }
+
+    public locator(selector: string) {
+        return this.page.locator(selector);
     }
 
 }

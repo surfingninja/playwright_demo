@@ -27,7 +27,7 @@ test.describe("Log in functionality feature", () => {
     test.beforeEach("Starting up a browser...", async ({ page }) => {
         const basePage = new BasePage(page);
         await basePage.goTo("https://www.douglas.de/de");
-        await basePage.acceptAllCookies();
+        await basePage.denyAllCookies();
         await basePage.openPage("/login");
     });
 
@@ -36,7 +36,7 @@ test.describe("Log in functionality feature", () => {
         await loginPage.login(creds[0].email, creds[0].password);
         await loginPage.waitForLoaderDisappear();
         await loginPage.goToAccount();
-        await expect(page.locator("//h2[contains(text(),'Hallo')]")).toBeVisible();
+        await expect(page.locator("[data-testid*='logged-in']")).toBeVisible({ timeout: 5000 });
     });
 
     for (const data of invCreds) {
@@ -44,7 +44,7 @@ test.describe("Log in functionality feature", () => {
             const loginPage = new LoginPage(page);
             await loginPage.login(data.email, data.password);
             await loginPage.waitForLoaderDisappear();
-            await expect(page.locator(".alert--message")).toContainText(data.error, {timeout: 10000});
+            await expect(page.getByTestId("alert-message")).toContainText(data.error, {timeout: 10000});
         });
     }
 
@@ -52,7 +52,7 @@ test.describe("Log in functionality feature", () => {
         const loginPage = new LoginPage(page);
         const resetPasswordPage = new ResetPassword(page);
         const email = process.env.EMAIL ? process.env.EMAIL : "undefined";
-        const newPassword: string = await loginPage.generateRandomString();
+        const newPassword: string = loginPage.generateRandomString();
 
         await loginPage.goToAccount();
         await loginPage.resetPasswordInit(email);
@@ -67,7 +67,7 @@ test.describe("Log in functionality feature", () => {
         }
 
         await resetPasswordPage.setNewPassword(resetPasswordLink, newPassword)
-        await expect(page.locator("//h2[contains(text(),'Hallo')]")).toBeVisible({ timeout: 5000 });
+        await expect(page.locator("[data-testid*='logged-in']")).toBeVisible({ timeout: 5000 });
     });
 
 })
