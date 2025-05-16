@@ -58,15 +58,15 @@ test.describe("Log in functionality feature", () => {
         await loginPage.resetPasswordInit(email);
 
         const { emailContents, sequenceNumbers } = await waitForEmail(30000);
-        let resetPasswordLink: any;
+        let resetPasswordLink!: string;
         for (const html of emailContents) {
             const domparser = new JSDOM(html);
             resetPasswordLink = domparser.window.document
-                .querySelector('a[href*="resetPassword"]')?.getAttribute('href');
+                .querySelector('a[href*="resetPassword"]')?.getAttribute('href') as string;
             await deleteMail(sequenceNumbers);
         }
 
-        await resetPasswordPage.setNewPassword(resetPasswordLink, newPassword)
+        await resetPasswordPage.setNewPassword(resetPasswordLink, newPassword);
         await expect(page.locator("[data-testid*='logged-in']")).toBeVisible({ timeout: 5000 });
     });
 
