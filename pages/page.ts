@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { Locator, type Page } from '@playwright/test';
 
 export class BasePage {
 
@@ -15,11 +15,11 @@ export class BasePage {
     }
 
     public async openPage(chunk: string) {
-        await this.page.goto(this.page.url() + chunk)
+        await this.page.goto(this.page.url() + chunk);
     }
 
     public async denyAllCookies() {
-        await this.page.getByTestId(this.denyCookies).click();
+        await this.locator(this.denyCookies).click();
     }
 
     public async reload() {
@@ -27,7 +27,7 @@ export class BasePage {
     }
 
     public async waitForLoaderDisappear() {
-        await this.page.locator(this.loader).waitFor({ state: 'hidden', timeout: 10000 });
+        await this.locator(this.loader).waitFor({ state: 'hidden', timeout: 10000 });
     }
 
     public generateRandomString(): string {
@@ -40,8 +40,8 @@ export class BasePage {
         return randomString;
     }
 
-    public locator(selector: string) {
-        return this.page.locator(selector);
+    public locator(selector: string | Locator): Locator {
+        return typeof selector === 'string' ? this.page.locator(selector) : selector;
     }
 
 }
