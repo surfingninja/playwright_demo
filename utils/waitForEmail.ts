@@ -1,9 +1,10 @@
-import { readMail } from "./readEmail";
+import { EmailContent, readMail, ReadMailOptions } from "./readEmail";
 
-export async function waitForEmail(timeout: number): Promise<{ emailContents: string[]; sequenceNumbers: number[] }> {
+export async function waitForEmail(options: ReadMailOptions, timeout: number)
+    : Promise<{ emailContents: EmailContent[]; sequenceNumbers: number[] }> {
     const startTime = Date.now();
     while (Date.now() - startTime < timeout) {
-        const { emailContents, sequenceNumbers } = await readMail();
+        const { emailContents, sequenceNumbers } = await readMail(options);
         if (emailContents.length > 0) {
             return { emailContents, sequenceNumbers };
         }

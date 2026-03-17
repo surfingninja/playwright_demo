@@ -44,29 +44,28 @@ test.describe("Log in functionality feature", () => {
             const loginPage = new LoginPage(page);
             await loginPage.login(data.email, data.password);
             await loginPage.waitForLoaderDisappear();
-            await expect(page.getByTestId("alert-message")).toContainText(data.error, {timeout: 10000});
+            await expect(page.getByTestId("alert-message")).toContainText(data.error, { timeout: 10000 });
         });
     }
 
     test("As a user I would like to reset my password if I forget my credentials", async ({ page }) => {
         const loginPage = new LoginPage(page);
         const resetPasswordPage = new ResetPassword(page);
-        const email = process.env.EMAIL ? process.env.EMAIL : "undefined";
+        const email = process.env.EMAIL ?? "undefined";
         const newPassword: string = loginPage.generateRandomString();
 
         await loginPage.goToAccount();
         await loginPage.resetPasswordInit(email);
 
-        const { emailContents, sequenceNumbers } = await waitForEmail(30000);
-        let resetPasswordLink!: string;
-        for (const html of emailContents) {
-            const domparser = new JSDOM(html);
-            resetPasswordLink = domparser.window.document
-                .querySelector('a[href*="resetPassword"]')?.getAttribute('href') as string;
-            await deleteMail(sequenceNumbers);
-        }
+        const { emailContents, sequenceNumbers } = await waitForEmail(
+            { from: "@douglas.de", subject: "Reset Password" }, 30000);
 
-        await resetPasswordPage.setNewPassword(resetPasswordLink, newPassword);
+        const rplink = emailContents
+            .map(e => e.html.match(/href=["'](https:\/\/[^"']*resetPassword[^"']*)["']/i))
+            .find(m => m !== null)?.[1];
+
+        await deleteMail(sequenceNumbers);
+        await resetPasswordPage.setNewPassword(rplink ?? '', newPassword);
         await expect(page.locator("[data-testid*='logged-in']")).toBeVisible({ timeout: 5000 });
     });
 
